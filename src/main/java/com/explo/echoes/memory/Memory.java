@@ -1,13 +1,16 @@
 package com.explo.echoes.memory;
 
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.explo.echoes.MemoryEchoes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * A tool's permanent history — what it has done, how long it has been doing it, and whose legacy
@@ -20,6 +23,13 @@ import net.minecraft.network.chat.ComponentSerialization;
  *
  * <p>The record is immutable. Accrual returns a new Memory rather than mutating one, which keeps
  * the arithmetic testable without a running game.
+ *
+ * <h2>Memory counts deeds, not wear</h2>
+ *
+ * <p>Every meaningful action is recorded here, whether or not it cost the tool any durability.
+ * That is what keeps "12,043 blocks mined" literally true on a tool enchanted with Unbreaking.
+ * Echoes are the layer that only accrues from real wear, which is what makes the repair economy
+ * net-negative by construction rather than by tuning.
  *
  * <h2>Schema</h2>
  *
@@ -64,8 +74,58 @@ public record Memory(
         return new Memory(SCHEMA_VERSION, gameTime, 1, Optional.empty(), 0, Map.of());
     }
 
+    /**
+     * The history carried by the given tool, if it has begun one.
+     *
+     * <p>Absent means the tool has genuinely never done anything worth remembering — an untouched
+     * pickaxe is byte-for-byte a vanilla pickaxe, not one holding an empty Memory.
+     */
+    public static Optional<Memory> of(ItemStack stack) {
+        return Optional.ofNullable(stack.get(MemoryEchoes.MEMORY)).map(Memory::migrated);
+    }
+
+    /** Writes this history back onto the tool it belongs to. */
+    public void saveTo(ItemStack stack) {
+        stack.set(MemoryEchoes.MEMORY, this);
+    }
+
+    /**
+     * This history one block later.
+     *
+     * @param affinity the character of the block, absent if it was something the tool has no
+     *                 particular relationship with — it still counts toward the total history,
+     *                 it just does not shape the tool's character
+     */
+    public Memory afterMining(Optional<Affinity> affinity) {
+        Map<Affinity, Integer> updated = affinity.map(this::incremented).orElse(affinities);
+        return new Memory(schemaVersion, awakenedAt, generation, inheritedFrom, blocksMined + 1, updated);
+    }
+
     /** How much of this tool's history was spent on the given kind of work. */
     public int count(Affinity affinity) {
         return affinities.getOrDefault(affinity, 0);
+    }
+
+    /**
+     * Brings a history loaded from an older schema up to the current one.
+     *
+     * <p>Every read goes through here, so there is exactly one place a future version bump adds
+     * its migration. Version 1 is currently the only version and every field in {@link #CODEC}
+     * has a default, so there is nothing to do yet.
+     *
+     * <p>A history from a *newer* schema than this build understands is returned untouched rather
+     * than rejected or rewritten. Memory is permanent and irreplaceable: an older client loading
+     * a tool it does not fully understand must hand it back intact, not corrupt a lineage it
+     * cannot read.
+     */
+    private Memory migrated() {
+        return this;
+    }
+
+    private Map<Affinity, Integer> incremented(Affinity affinity) {
+        EnumMap<Affinity, Integer> updated = new EnumMap<>(Affinity.class);
+        updated.putAll(affinities);
+        updated.merge(affinity, 1, Integer::sum);
+        return updated;
     }
 }
