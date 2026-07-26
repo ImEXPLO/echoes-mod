@@ -1,13 +1,2 @@
 {
-  "itemGroup.memoryechoes": "Example Mod Tab",
-  "block.memoryechoes.example_block": "Example Block",
-  "item.memoryechoes.example_item": "Example Item",
-
-  "memoryechoes.configuration.title": "Memory Echoes Configs",
-  "memoryechoes.configuration.section.memoryechoes.common.toml": "Memory Echoes Configs",
-  "memoryechoes.configuration.section.memoryechoes.common.toml.title": "Memory Echoes Configs",
-  "memoryechoes.configuration.items": "Item List",
-  "memoryechoes.configuration.logDirtBlock": "Log Dirt Block",
-  "memoryechoes.configuration.magicNumberIntroduction": "Magic Number Text",
-  "memoryechoes.configuration.magicNumber": "Magic Number"
 }
