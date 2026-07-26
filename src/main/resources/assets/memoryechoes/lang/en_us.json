@@ -10,7 +10,13 @@
   "tooltip.memoryechoes.awakened_today": "Awakened today",
   "tooltip.memoryechoes.awakened_yesterday": "Awakened a day ago",
   "tooltip.memoryechoes.awakened": "Awakened %s days ago",
+  "tooltip.memoryechoes.lineage_begun_today": "A line begun today",
+  "tooltip.memoryechoes.lineage_begun_yesterday": "A line begun a day ago",
+  "tooltip.memoryechoes.lineage_begun": "A line begun %s days ago",
   "tooltip.memoryechoes.inherited_from": "Inherited from %s",
+  "tooltip.memoryechoes.forebears": "%s tools came before it",
+
+  "merge.memoryechoes.lives_on": "%s lives on in this one",
 
   "trait.memoryechoes.gathers_stone": "Gathers the stone it breaks",
   "trait.memoryechoes.gathers_ore": "Gathers the ore it finds",

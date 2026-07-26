@@ -65,6 +65,25 @@ public enum Trait {
         return earned;
     }
 
+    /**
+     * The highest Trait threshold a given amount of work has already earned, or zero.
+     *
+     * <p>Merge uses this as a floor. A proportional transfer alone could drop a successor just
+     * below a threshold its predecessor had passed, silently revoking a Trait and turning an
+     * upgrade into a downgrade of the tool's personality. Guaranteeing the inherited count never
+     * falls below what was already achieved preserves every earned Trait without storing a single
+     * unlock flag.
+     */
+    public static int highestThresholdCrossed(Affinity affinity, int count) {
+        int crossed = 0;
+        for (Trait trait : values()) {
+            if (trait.affinity == affinity && count >= trait.threshold) {
+                crossed = Math.max(crossed, trait.threshold);
+            }
+        }
+        return crossed;
+    }
+
     /** The lang key suffix identifying this Trait. */
     public String id() {
         return id;

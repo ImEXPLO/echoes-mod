@@ -79,6 +79,7 @@ public final class ToolTooltip {
         }
         awakened(memory, reader).ifPresent(lines::add);
         memory.inheritedFrom().map(ToolTooltip::inheritedFrom).ifPresent(lines::add);
+        forebears(memory).ifPresent(lines::add);
     }
 
     /**
@@ -169,15 +170,37 @@ public final class ToolTooltip {
         long elapsed = Math.max(0L, reader.level().getGameTime() - memory.awakenedAt());
         long days = elapsed / TICKS_PER_DAY;
 
+        // An inherited tool is younger than the history it carries, so it dates the line rather
+        // than itself. "A line begun 14 days ago" on a pickaxe forged this morning is the whole
+        // point: the object is new, the story is not.
+        String key = memory.generation() > 1
+                ? "tooltip.memoryechoes.lineage_begun"
+                : "tooltip.memoryechoes.awakened";
+
         MutableComponent line;
         if (days == 0L) {
-            line = Component.translatable("tooltip.memoryechoes.awakened_today");
+            line = Component.translatable(key + "_today");
         } else if (days == 1L) {
-            line = Component.translatable("tooltip.memoryechoes.awakened_yesterday");
+            line = Component.translatable(key + "_yesterday");
         } else {
-            line = Component.translatable("tooltip.memoryechoes.awakened", days);
+            line = Component.translatable(key, days);
         }
         return Optional.of(line.withStyle(ChatFormatting.DARK_GRAY));
+    }
+
+    /**
+     * How far back the line runs, beyond the predecessor already named above.
+     *
+     * <p>Silent for a second-generation tool, where "Inherited from …" has already said everything
+     * there is to say. It appears on the third and turns two tools into a lineage.
+     */
+    private static Optional<Component> forebears(Memory memory) {
+        int before = memory.generation() - 1;
+        if (before < 2) {
+            return Optional.empty();
+        }
+        return Optional.of(Component.translatable("tooltip.memoryechoes.forebears", before)
+                .withStyle(ChatFormatting.DARK_GRAY));
     }
 
     /**
