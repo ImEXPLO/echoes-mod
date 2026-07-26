@@ -2,6 +2,7 @@ package com.explo.echoes;
 
 import org.slf4j.Logger;
 
+import com.explo.echoes.echoes.Echoes;
 import com.explo.echoes.memory.Memory;
 import com.mojang.logging.LogUtils;
 
@@ -30,6 +31,16 @@ public class MemoryEchoes {
      */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Memory>> MEMORY =
             COMPONENTS.registerComponentType("memory", builder -> builder.persistent(Memory.CODEC));
+
+    /**
+     * The spendable resource a tool's wear leaves behind.
+     *
+     * <p>Kept as its own component rather than a field on Memory, because the two have opposite
+     * lifetimes: Memory is permanent and Echoes are constantly consumed. Storing a spendable
+     * number inside a permanent record would be the first step toward spending the identity.
+     */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Echoes>> ECHOES =
+            COMPONENTS.registerComponentType("echoes", builder -> builder.persistent(Echoes.CODEC));
 
     public MemoryEchoes(IEventBus modEventBus) {
         COMPONENTS.register(modEventBus);

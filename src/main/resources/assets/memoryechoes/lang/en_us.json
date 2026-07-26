@@ -6,8 +6,12 @@
 
   "tooltip.memoryechoes.remembers": "Remembers %s blocks",
   "tooltip.memoryechoes.drawn_to": "Drawn to %s",
+  "tooltip.memoryechoes.affinity_count": "%s %s",
   "tooltip.memoryechoes.awakened_today": "Awakened today",
   "tooltip.memoryechoes.awakened_yesterday": "Awakened a day ago",
   "tooltip.memoryechoes.awakened": "Awakened %s days ago",
-  "tooltip.memoryechoes.inherited_from": "Inherited from %s"
+  "tooltip.memoryechoes.inherited_from": "Inherited from %s",
+
+  "tooltip.memoryechoes.echoes": "Echoes: %s",
+  "tooltip.memoryechoes.echoes_progress": "%s/%s toward the next"
 }
