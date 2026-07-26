@@ -12,6 +12,11 @@
   "tooltip.memoryechoes.awakened": "Awakened %s days ago",
   "tooltip.memoryechoes.inherited_from": "Inherited from %s",
 
+  "trait.memoryechoes.gathers_stone": "Gathers the stone it breaks",
+  "trait.memoryechoes.gathers_ore": "Gathers the ore it finds",
+  "trait.memoryechoes.gathers_wood": "Gathers the wood it fells",
+  "trait.memoryechoes.gathers_earth": "Gathers the earth it digs",
+
   "tooltip.memoryechoes.echoes": "Echoes: %s",
   "tooltip.memoryechoes.echoes_progress": "%s/%s toward the next"
 }

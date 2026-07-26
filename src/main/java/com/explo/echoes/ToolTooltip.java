@@ -3,10 +3,12 @@ package com.explo.echoes;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 import com.explo.echoes.echoes.Echoes;
 import com.explo.echoes.memory.Affinity;
 import com.explo.echoes.memory.Memory;
+import com.explo.echoes.traits.Trait;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -65,6 +67,7 @@ public final class ToolTooltip {
         List<Component> lines = event.getToolTip();
         lines.add(Component.empty());
         memory.ifPresent(m -> appendHistory(m, event.getEntity(), advanced, lines));
+        memory.map(Trait::derivedFrom).ifPresent(traits -> appendTraits(traits, lines));
         echoes.ifPresent(e -> appendEchoes(e, advanced, lines));
     }
 
@@ -107,6 +110,20 @@ public final class ToolTooltip {
         }
 
         return first ? Optional.empty() : Optional.of(tally.withStyle(ChatFormatting.DARK_GRAY));
+    }
+
+    /**
+     * What the tool has learned, sitting between what it has done and what it has to spend — the
+     * layers in the order they depend on each other.
+     *
+     * <p>Always shown, never hidden behind F3+H: a Trait is the payoff for a long history, and a
+     * payoff nobody notices is not a payoff.
+     */
+    private static void appendTraits(Set<Trait> traits, List<Component> lines) {
+        for (Trait trait : traits) {
+            lines.add(Component.translatable("trait.memoryechoes." + trait.id())
+                    .withStyle(ChatFormatting.GREEN));
+        }
     }
 
     private static void appendEchoes(Echoes echoes, boolean advanced, List<Component> lines) {
