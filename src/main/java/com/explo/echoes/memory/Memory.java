@@ -107,6 +107,22 @@ public record Memory(
     }
 
     /**
+     * The kind of work this tool has done most of, if it has done any that counts.
+     *
+     * <p>Ties break toward the affinity declared first, so a tool's stated character never
+     * flickers between two equal halves of its history.
+     */
+    public Optional<Affinity> dominantAffinity() {
+        Affinity dominant = null;
+        for (Affinity affinity : Affinity.values()) {
+            if (count(affinity) > 0 && (dominant == null || count(affinity) > count(dominant))) {
+                dominant = affinity;
+            }
+        }
+        return Optional.ofNullable(dominant);
+    }
+
+    /**
      * Brings a history loaded from an older schema up to the current one.
      *
      * <p>Every read goes through here, so there is exactly one place a future version bump adds
