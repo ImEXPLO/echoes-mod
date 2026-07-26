@@ -74,4 +74,17 @@ public record Echoes(int available, int progress) {
         int accumulated = progress + wear;
         return new Echoes(available + accumulated / WEAR_PER_ECHO, accumulated % WEAR_PER_ECHO);
     }
+
+    /**
+     * These Echoes after spending some of them.
+     *
+     * <p>Progress toward the next Echo is untouched: spending is not a reset, and a tool that has
+     * almost formed its next Echo does not lose that ground by cashing in the ones it already has.
+     *
+     * @param count how many to spend, which callers are expected to have capped at
+     *              {@link #available()} — see {@link Repair#of(int, int)}
+     */
+    public Echoes afterSpending(int count) {
+        return new Echoes(available - count, progress);
+    }
 }
