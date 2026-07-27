@@ -17,6 +17,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemLore;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AnvilUpdateEvent;
@@ -51,6 +52,10 @@ public final class MergeOnAnvil {
     private static final List<TagKey<Item>> TOOL_CLASSES =
             List.of(ItemTags.PICKAXES, ItemTags.AXES, ItemTags.SHOVELS, ItemTags.HOES, ItemTags.SWORDS);
 
+    private static final ItemLore ENCHANTMENT_WARNING = new ItemLore(List.of(
+            Component.translatable("merge.memoryechoes.warning_enchantments"),
+            Component.translatable("merge.memoryechoes.warning_memory_only")));
+
     private MergeOnAnvil() {}
 
     /**
@@ -84,9 +89,42 @@ public final class MergeOnAnvil {
         }
 
         Merge.inherit(ancestry.get(), Memory.of(inheritor), predecessor.getHoverName()).saveTo(inheritor);
+        warnAboutEnchantments(inheritor, predecessor);
 
         event.setMaterialCost(1);
         event.setOutput(inheritor);
+    }
+
+    /**
+     * Says out loud what the merge is about to cost.
+     *
+     * <p>Merge moves history and nothing else, which is a clean rule and a nasty surprise: the
+     * player feeds in an enchanted veteran, and the successor comes out with none of those
+     * enchantments and none of that durability. Vanilla would simply have refused the pairing, so
+     * from the player's side this reads less like a documented limitation than like the mod eating
+     * their pickaxe. The warning turns a bug report into an informed decision, and it appears in
+     * the output preview — before anything has been spent.
+     *
+     * <p>Written as lore because that is the only channel an anvil preview has, and removed again
+     * the moment the item is taken. It is only ever applied to a successor carrying no lore of its
+     * own, and only ever removed when it matches this warning exactly, so a player's own lore can
+     * be neither overwritten nor deleted.
+     */
+    private static void warnAboutEnchantments(ItemStack inheritor, ItemStack predecessor) {
+        if (predecessor.getEnchantments().isEmpty()) {
+            return;
+        }
+        if (!inheritor.getOrDefault(DataComponents.LORE, ItemLore.EMPTY).lines().isEmpty()) {
+            return;
+        }
+        inheritor.set(DataComponents.LORE, ENCHANTMENT_WARNING);
+    }
+
+    private static void clearWarning(ItemStack taken) {
+        ItemLore lore = taken.get(DataComponents.LORE);
+        if (lore != null && lore.lines().equals(ENCHANTMENT_WARNING.lines())) {
+            taken.remove(DataComponents.LORE);
+        }
     }
 
     /**
@@ -105,25 +143,45 @@ public final class MergeOnAnvil {
             return;
         }
 
+        clearWarning(event.getOutput());
+
         Memory.of(event.getOutput())
                 .flatMap(Memory::inheritedFrom)
                 .ifPresent(predecessor -> commemorate(player, predecessor));
     }
 
+    /**
+     * The ceremony.
+     *
+     * <p>This is the emotional climax of the mod, and the hardest thing to stage: both tools live
+     * inside a GUI, so nothing can literally travel from one to the other. The handover is evoked
+     * instead. A wide, slow-rising column of motes stands in for what is being given up; a tight
+     * gathering at the player's hands stands in for what is being taken on. Two sounds an octave
+     * apart make it read as a single event with two halves rather than one noise.
+     *
+     * <p>Deliberately quiet for a climax. A merge should feel like something being entrusted, and
+     * fireworks would make it feel like a reward.
+     */
     private static void commemorate(ServerPlayer player, Component predecessor) {
-        player.sendOverlayMessage(Component.translatable("merge.memoryechoes.lives_on", predecessor)
-                .withStyle(ChatFormatting.GRAY));
-
-        // Restrained on purpose: this should read as something quietly passing between two tools,
-        // not as a spell being cast.
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 1.0F);
+                SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 0.8F);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.5F, 1.6F);
 
         if (player.level() instanceof ServerLevel level) {
+            // What is being let go: a broad, unhurried drift upward.
+            level.sendParticles(ParticleTypes.END_ROD,
+                    player.getX(), player.getY() + 0.4, player.getZ(),
+                    18, 0.5, 0.1, 0.5, 0.04);
+
+            // What is being taken on: drawn in close, hanging where it arrives.
             level.sendParticles(ParticleTypes.ENCHANT,
-                    player.getX(), player.getY() + 1.2, player.getZ(),
-                    24, 0.4, 0.5, 0.4, 0.05);
+                    player.getX(), player.getY() + 1.3, player.getZ(),
+                    32, 0.3, 0.4, 0.3, 0.0);
         }
+
+        player.sendOverlayMessage(Component.translatable("merge.memoryechoes.lives_on", predecessor)
+                .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
     }
 
     private static void applyName(ItemStack inheritor, String name) {

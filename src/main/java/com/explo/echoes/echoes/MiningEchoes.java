@@ -1,6 +1,10 @@
 package com.explo.echoes.echoes;
 
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -46,6 +50,31 @@ public final class MiningEchoes {
             return;
         }
 
-        Echoes.of(tool).orElse(Echoes.NONE).afterWear(wear).saveTo(tool);
+        Echoes before = Echoes.of(tool).orElse(Echoes.NONE);
+        Echoes after = before.afterWear(wear);
+        after.saveTo(tool);
+
+        if (after.available() > before.available()) {
+            markNewEcho(player);
+        }
+    }
+
+    /**
+     * The instant an Echo finishes forming.
+     *
+     * <p>Barely there on purpose. This happens every twenty-five points of wear for the rest of a
+     * tool's life, so anything a player could describe as a jingle would become noise inside an
+     * hour. The intent is that they register it without ever being interrupted by it — a small high
+     * note and three motes, gone before they finish the swing.
+     */
+    private static void markNewEcho(ServerPlayer player) {
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.22F, 1.9F);
+
+        if (player.level() instanceof ServerLevel level) {
+            level.sendParticles(ParticleTypes.ENCHANT,
+                    player.getX(), player.getY() + 1.1, player.getZ(),
+                    3, 0.2, 0.2, 0.2, 0.0);
+        }
     }
 }

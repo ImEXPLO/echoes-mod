@@ -1,5 +1,8 @@
 package com.explo.echoes.echoes;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -44,12 +47,44 @@ public final class RepairOnUse {
 
         tool.setDamageValue(tool.getDamageValue() - repair.durabilityRestored());
         echoes.afterSpending(repair.echoesSpent()).saveTo(tool);
-
-        // Restrained on purpose: a chime, not a spectacle. The tooltip already shows what changed.
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.7F, 1.2F);
+        recall(player, repair.echoesSpent());
 
         event.setCancellationResult(InteractionResult.SUCCESS_SERVER);
         event.setCanceled(true);
+    }
+
+    /**
+     * The moment the tool's past answers.
+     *
+     * <p>Everything here is trying to make a subtraction feel like a recollection. The particles
+     * gather at the player's hands rather than scattering outward, because something is being drawn
+     * back in rather than given off. The pitch falls as more Echoes are spent, so a deep recall
+     * sounds older than a shallow one — the tool has reached further back. And a line of text says
+     * what no counter can.
+     *
+     * <p>Understated throughout. This happens every time a player mends a tool, and anything
+     * louder would wear out long before the mod does.
+     */
+    private static void recall(ServerPlayer player, int echoesSpent) {
+        float depth = Math.min(echoesSpent, 8) / 8.0F;
+
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.6F, 1.3F - depth * 0.4F);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.25F + depth * 0.2F, 1.1F);
+
+        if (player.level() instanceof ServerLevel level) {
+            // Zero speed: the motes hang where they appear instead of flying off, which reads as
+            // something surfacing rather than something escaping.
+            level.sendParticles(ParticleTypes.ENCHANT,
+                    player.getX(), player.getY() + 1.1, player.getZ(),
+                    8 + Math.min(echoesSpent, 6) * 2, 0.35, 0.3, 0.35, 0.0);
+            level.sendParticles(ParticleTypes.END_ROD,
+                    player.getX(), player.getY() + 1.0, player.getZ(),
+                    3, 0.25, 0.2, 0.25, 0.005);
+        }
+
+        player.sendOverlayMessage(Recollection.random(player.getRandom())
+                .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
     }
 }

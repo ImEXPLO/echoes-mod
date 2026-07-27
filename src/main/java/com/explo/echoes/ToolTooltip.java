@@ -65,21 +65,52 @@ public final class ToolTooltip {
 
         boolean advanced = event.getFlags().isAdvanced();
         List<Component> lines = event.getToolTip();
-        lines.add(Component.empty());
-        memory.ifPresent(m -> appendHistory(m, event.getEntity(), advanced, lines));
-        memory.map(Trait::derivedFrom).ifPresent(traits -> appendTraits(traits, lines));
-        echoes.ifPresent(e -> appendEchoes(e, advanced, lines));
+        Set<Trait> traits = memory.map(Trait::derivedFrom).orElse(Set.of());
+
+        // Each layer gets its own paragraph. Run together they read as a statistics block; spaced
+        // apart they read as three separate things the tool has to say -- what it has lived, what
+        // that taught it, and what it still holds. The blank lines are the cheapest storytelling
+        // in the mod.
+        memory.ifPresent(m -> {
+            lines.add(Component.empty());
+            appendHistory(m, event.getEntity(), lines);
+        });
+        if (!traits.isEmpty()) {
+            lines.add(Component.empty());
+            appendTraits(traits, lines);
+        }
+        echoes.ifPresent(e -> {
+            lines.add(Component.empty());
+            appendEchoes(e, tool, lines);
+        });
+
+        // Debug last, in its own paragraph. Numbers for tuning have no business interrupting the
+        // three things the tool is trying to say.
+        if (advanced) {
+            appendDebug(memory, echoes, lines);
+        }
     }
 
-    private static void appendHistory(Memory memory, Player reader, boolean advanced, List<Component> lines) {
+    private static void appendHistory(Memory memory, Player reader, List<Component> lines) {
         lines.add(remembers(memory));
         memory.dominantAffinity().map(ToolTooltip::drawnTo).ifPresent(lines::add);
-        if (advanced) {
-            affinityCounts(memory).ifPresent(lines::add);
-        }
         awakened(memory, reader).ifPresent(lines::add);
         memory.inheritedFrom().map(ToolTooltip::inheritedFrom).ifPresent(lines::add);
         forebears(memory).ifPresent(lines::add);
+    }
+
+    /** Everything a player only wants while tuning, kept out of the way of everything they don't. */
+    private static void appendDebug(Optional<Memory> memory, Optional<Echoes> echoes, List<Component> lines) {
+        Optional<Component> counts = memory.flatMap(ToolTooltip::affinityCounts);
+        if (counts.isEmpty() && echoes.isEmpty()) {
+            return;
+        }
+
+        lines.add(Component.empty());
+        counts.ifPresent(lines::add);
+        echoes.ifPresent(e -> lines.add(Component.translatable("tooltip.memoryechoes.echoes_progress",
+                        e.progress(), Echoes.WEAR_PER_ECHO)
+                .withStyle(ChatFormatting.DARK_GRAY)));
     }
 
     /**
@@ -127,15 +158,18 @@ public final class ToolTooltip {
         }
     }
 
-    private static void appendEchoes(Echoes echoes, boolean advanced, List<Component> lines) {
+    private static void appendEchoes(Echoes echoes, ItemStack tool, List<Component> lines) {
         lines.add(Component.translatable("tooltip.memoryechoes.echoes", echoes.available())
                 .withStyle(ChatFormatting.LIGHT_PURPLE));
 
-        // How close the next Echo is matters while tuning and almost never while playing, so it
-        // rides along with the rest of the debug readout under F3+H.
-        if (advanced) {
-            lines.add(Component.translatable("tooltip.memoryechoes.echoes_progress",
-                            echoes.progress(), Echoes.WEAR_PER_ECHO)
+        // Recalling is a verb nothing else in the game teaches. Without this line a player can hold
+        // a tool full of Echoes for an entire playthrough and never learn they can do anything with
+        // them -- so the hint appears exactly when the action would actually work, and vanishes
+        // again the moment it would not.
+        if (echoes.available() > 0 && tool.isDamaged()) {
+            lines.add(Component.translatable("tooltip.memoryechoes.recall_hint")
+                    .withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+            lines.add(Component.translatable("tooltip.memoryechoes.recall_keys")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
     }

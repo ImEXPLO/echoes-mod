@@ -32,18 +32,23 @@ public record Repair(int echoesSpent, int durabilityRestored) {
     public static final Repair NOTHING = new Repair(0, 0);
 
     /**
-     * What a tool holding {@code available} Echoes and carrying {@code damage} would get out of a
-     * repair right now.
+     * What spending up to {@code echoesOffered} Echoes on a tool carrying {@code damage} would
+     * accomplish.
      *
-     * <p>Spends only as many Echoes as the damage can absorb, so mending a barely-scratched tool
-     * never wastes the rest of its history on a single point of durability.
+     * <p>Spends only as many as the damage can absorb, so mending a barely-scratched tool never
+     * wastes the rest of its history on a single point of durability.
+     *
+     * <p>Note that the first argument is a <em>budget</em>, not a fact about the tool. Callers
+     * currently offer everything a tool holds, but nothing here assumes that: offering three Echoes
+     * yields a three-Echo repair. A future partial or batched repair is therefore a change at the
+     * call site alone, with no rework of this calculation and no new concept to introduce.
      */
-    public static Repair of(int available, int damage) {
-        if (available <= 0 || damage <= 0) {
+    public static Repair of(int echoesOffered, int damage) {
+        if (echoesOffered <= 0 || damage <= 0) {
             return NOTHING;
         }
 
-        int spent = Math.min(available, Math.ceilDiv(damage, DURABILITY_PER_ECHO));
+        int spent = Math.min(echoesOffered, Math.ceilDiv(damage, DURABILITY_PER_ECHO));
         return new Repair(spent, Math.min(damage, spent * DURABILITY_PER_ECHO));
     }
 }

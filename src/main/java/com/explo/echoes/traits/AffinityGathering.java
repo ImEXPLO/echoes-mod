@@ -1,6 +1,5 @@
 package com.explo.echoes.traits;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +9,7 @@ import com.explo.echoes.memory.Memory;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
@@ -67,20 +67,24 @@ public final class AffinityGathering {
     }
 
     /**
-     * Moves what fits into the player's inventory and leaves the rest to drop normally.
+     * Brings the drops to the player and lets vanilla do the picking up.
      *
-     * <p>{@code Inventory.add} consumes the stack as it goes, so a partially-accepted drop keeps
-     * its remainder and still falls to the ground — a full inventory quietly degrades to vanilla
-     * behaviour rather than eating anything.
+     * <p>Moving the stacks straight into the inventory would be simpler and it is what this did
+     * first, but it skipped everything that makes a pickup <em>feel</em> like a pickup: the item's
+     * flight toward the player, the pickup sound, the statistic, and the events other mods listen
+     * to. The Trait looked, from the player's chair, like nothing happening at all.
+     *
+     * <p>So the drops are repositioned onto the player and cleared to be taken immediately, and
+     * vanilla collects them a tick later exactly as it collects anything else. Same convenience,
+     * none of the feedback thrown away — and a full inventory still degrades to items on the floor
+     * without any special handling.
      */
     private static void gather(ServerPlayer player, List<ItemEntity> drops) {
-        Iterator<ItemEntity> remaining = drops.iterator();
-        while (remaining.hasNext()) {
-            ItemStack stack = remaining.next().getItem();
-            player.getInventory().add(stack);
-            if (stack.isEmpty()) {
-                remaining.remove();
-            }
+        for (ItemEntity drop : drops) {
+            drop.setPos(player.getX(), player.getY() + 0.5, player.getZ());
+            drop.setDeltaMovement(Vec3.ZERO);
+            drop.setNoPickUpDelay();
+            drop.setTarget(player.getUUID());
         }
     }
 }
