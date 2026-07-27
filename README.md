@@ -16,7 +16,7 @@ When you finally upgrade to diamond, you don't abandon that history. You hand it
 |------------|-----------|---------------------------------------------------------------|
 | **Memory** | Permanent | The tool's story — what it has broken, what it's drawn to, how long it has been at work. Never spent. |
 | **Echoes** | Temporary | A resource formed from the durability the tool actually spends. Recall them to mend it. |
-| **Traits** | Derived   | Passive behaviours the tool earns. Never stored — always recomputed from Memory, so they survive an upgrade automatically. |
+| **Traits** | Derived   | Passive behaviors the tool earns. Never stored — always recomputed from Memory, so they survive an upgrade automatically. |
 
 > Memory tells the story. Echoes create the economy. Traits express identity.
 
@@ -28,13 +28,17 @@ past still wears out. This is not a Mending alternative.
 
 ## Try it in two minutes
 
-Everything below is vanilla-friendly — no new blocks, no new items, no new GUI.
+Everything below is vanilla-friendly — no new blocks, no custom items, no new GUI.
 
-You start with **A Worn Journal**, left by someone who studied Echoes before you. It is short, and
-it is the only thing that tells you the two actions a tooltip cannot.
+You start with **Journal of an Unknown Craftsman**, left by someone who studied Echoes long before
+you. It is six pages, it is an ordinary written book, and it is the only thing in the game that
+tells you where a legacy is handed on.
 
 **1. Mine, and read the tooltip.** After a handful of blocks any tool starts remembering. Hold
 `F3+H` for the exact tally.
+
+> **Play in survival.** Tools take no damage in creative and blocks are never harvested there, so
+> nothing accrues and the mod will look inert. Everything below assumes survival mode.
 
 **2. Recall its Echoes.** Sneak and right-click *at the air* holding a worn tool. It mends itself,
 and tells you something about what it just reached for.
@@ -96,9 +100,23 @@ These are enforced, not aspirational — several are covered by tests in `src/te
 - **An upgrade never revokes an earned Trait.** Inherited Memory is floored at the highest threshold
   the predecessor had already crossed.
 - **Merge is inheritance, not fusion.** One predecessor, same tool class, never additive — so
-  histories cannot be funnelled together or laundered.
+  histories cannot be funneled together or laundered.
 - **Merge is enchantment-agnostic.** Enchantments remain entirely the anvil's business.
 - **Memory is versioned** from the first commit, and never fails to load.
+
+---
+
+## Languages
+
+English, Brazilian and European Portuguese, Spanish, French, German, Italian, Japanese, Korean,
+Simplified Chinese and Russian.
+
+Localization files were initially generated with AI assistance and carefully reviewed before
+inclusion. All gameplay systems, architecture, balancing decisions and implementation were designed
+and developed for this project.
+
+Native-speaker corrections are welcome — the journal and the recall lines are written to carry a
+tone, and tone is the first thing a translation loses.
 
 ---
 

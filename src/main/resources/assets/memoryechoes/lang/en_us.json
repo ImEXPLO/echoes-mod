@@ -6,7 +6,6 @@
 
   "tooltip.memoryechoes.remembers": "Remembers %s blocks",
   "tooltip.memoryechoes.drawn_to": "Drawn to %s",
-  "tooltip.memoryechoes.affinity_count": "%s %s",
   "tooltip.memoryechoes.awakened_today": "Awakened today",
   "tooltip.memoryechoes.awakened_yesterday": "Awakened a day ago",
   "tooltip.memoryechoes.awakened": "Awakened %s days ago",
@@ -15,8 +14,21 @@
   "tooltip.memoryechoes.lineage_begun": "A line begun %s days ago",
   "tooltip.memoryechoes.inherited_from": "Inherited from %s",
   "tooltip.memoryechoes.forebears": "%s tools came before it",
+  "tooltip.memoryechoes.echoes": "Echoes: %s",
+  "tooltip.memoryechoes.recall_hint": "The past still answers...",
+  "tooltip.memoryechoes.recall_keys": "Sneak + Right Click",
+  "tooltip.memoryechoes.affinity_count": "%s %s",
+  "tooltip.memoryechoes.echoes_progress": "%s/%s toward the next",
+
+  "trait.memoryechoes.gathers_stone": "Gathers the stone it breaks",
+  "trait.memoryechoes.gathers_ore": "Gathers the ore it finds",
+  "trait.memoryechoes.gathers_wood": "Gathers the wood it fells",
+  "trait.memoryechoes.gathers_earth": "Gathers the earth it digs",
+  "trait.memoryechoes.learned": "✦ Your tool learned something — drawn to %s",
 
   "merge.memoryechoes.lives_on": "%s lives on in this one",
+  "merge.memoryechoes.warning_enchantments": "⚠ Enchantments are not inherited.",
+  "merge.memoryechoes.warning_memory_only": "Only Memory is passed on.",
 
   "recall.memoryechoes.1": "The past answers.",
   "recall.memoryechoes.2": "Forgotten memories resonate.",
@@ -48,7 +60,7 @@
   "recall.memoryechoes.28": "It remembers being whole.",
   "recall.memoryechoes.29": "An echo of every swing.",
   "recall.memoryechoes.30": "The past is not finished.",
-  "recall.memoryechoes.31": "Long labour answers.",
+  "recall.memoryechoes.31": "Long labor answers.",
   "recall.memoryechoes.32": "Something older than the metal.",
   "recall.memoryechoes.33": "It has done this before.",
   "recall.memoryechoes.34": "Familiar ground, remembered.",
@@ -67,27 +79,10 @@
   "recall.memoryechoes.47": "The echoes settle again.",
   "recall.memoryechoes.48": "It carries on.",
 
-  "trait.memoryechoes.gathers_stone": "Gathers the stone it breaks",
-  "trait.memoryechoes.gathers_ore": "Gathers the ore it finds",
-  "trait.memoryechoes.gathers_wood": "Gathers the wood it fells",
-  "trait.memoryechoes.gathers_earth": "Gathers the earth it digs",
-
-  "tooltip.memoryechoes.echoes": "Echoes: %s",
-  "tooltip.memoryechoes.echoes_progress": "%s/%s toward the next",
-  "tooltip.memoryechoes.recall_hint": "The past still answers...",
-  "tooltip.memoryechoes.recall_keys": "Sneak + Right Click",
-
-  "trait.memoryechoes.learned": "✦ Your tool learned something — drawn to %s",
-
-  "merge.memoryechoes.warning_enchantments": "⚠ Enchantments are not inherited.",
-  "merge.memoryechoes.warning_memory_only": "Only Memory is passed on.",
-
-  "journal.memoryechoes.title": "A Worn Journal",
-  "journal.memoryechoes.author": "A former keeper",
-  "journal.memoryechoes.page.1": "I kept this journal longer than the tools it describes.\n\nIf you are reading it, mine are long since worn through.\n\nBegin here.",
-  "journal.memoryechoes.page.2": "A tool remembers.\n\nNot in any way you can prise open — but swing one long enough and it keeps count of all it has broken.\n\nHold one. Look closely.\n\nIt will tell you.",
-  "journal.memoryechoes.page.3": "Given time, it acquires a leaning.\n\nStone, or ore, or wood, or earth — whichever it has known most.\n\nWork it long enough at one thing, and it learns to do that thing for you.",
-  "journal.memoryechoes.page.4": "Wear leaves something behind.\n\nEvery scratch a tool takes gives back a fragment of what it was.\n\nEchoes, I came to call them.\n\nThey gather quietly.",
-  "journal.memoryechoes.page.5": "They can be called upon.\n\nCrouch, and reach out with the tool held and nothing in front of you.\n\nWhat it remembers will mend what time took. Never all of it. Never more than it cost.",
-  "journal.memoryechoes.page.6": "And when a tool is finally spent —\n\nlay the new one on the anvil first, the old one beside it.\n\nWhat the old one knew, the new one will carry.\n\nNothing is truly lost. It only changes hands."
+  "journal.memoryechoes.page.1": "I once believed every tool was born empty.\n\nI was wrong.",
+  "journal.memoryechoes.page.2": "Steel remembers.\n\nStone remembers.\n\nEven wood remembers.\n\nWe simply forgot how to listen.",
+  "journal.memoryechoes.page.3": "Sometimes, after enough work...\n\nI hear them.\n\nNot voices.\n\nEchoes.",
+  "journal.memoryechoes.page.4": "Hold the tool.\n\nStand still.\n\nQuiet your hands.\n\nThe past answers those willing to listen.",
+  "journal.memoryechoes.page.5": "I feared replacing an old companion.\n\nSo I laid the new one upon the anvil, and set the old beside it.\n\nSteel may break.\n\nMemory does not.",
+  "journal.memoryechoes.page.6": "Nothing is ever truly lost.\n\nOnly remembered differently."
 }

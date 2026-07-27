@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
@@ -45,8 +46,16 @@ public final class TraitAwakening {
             return;
         }
 
+        // Must match the gate that records Memory. Without it this fires on blocks that never
+        // advanced the count -- dig soil with a pickaxe while the tool happens to sit exactly on the
+        // earth threshold and the announcement repeats on every single block, forever.
+        ItemStack tool = player.getMainHandItem();
+        if (tool.isEmpty() || !tool.isDamageableItem() || !tool.isCorrectToolForDrops(event.getState())) {
+            return;
+        }
+
         Optional<Affinity> affinity = Affinity.of(event.getState());
-        Optional<Memory> memory = Memory.of(player.getMainHandItem());
+        Optional<Memory> memory = Memory.of(tool);
         if (affinity.isEmpty() || memory.isEmpty()) {
             return;
         }

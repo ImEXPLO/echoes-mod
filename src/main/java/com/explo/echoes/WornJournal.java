@@ -40,6 +40,9 @@ public final class WornJournal {
 
     private static final int PAGES = 6;
 
+    private static final String TITLE = "Journal of an Unknown Craftsman";
+    private static final String AUTHOR = "Unknown";
+
     private WornJournal() {}
 
     @SubscribeEvent
@@ -68,11 +71,14 @@ public final class WornJournal {
             pages.add(Filterable.passThrough(Component.translatable("journal.memoryechoes.page." + page)));
         }
 
-        // Title and author are plain strings by vanilla's format, so unlike the pages they cannot
-        // be translated per-client and resolve against the server's language.
+        // Title and author are plain strings in vanilla's format, not components, so they cannot be
+        // translated per-client at all. Resolving them from a lang key would also have meant calling
+        // getString() on the server, where this mod's assets are not loaded -- a dedicated server
+        // would have handed out a book titled "journal.memoryechoes.title". Literals are both
+        // safer and more honest about what this field can do.
         journal.set(DataComponents.WRITTEN_BOOK_CONTENT, new WrittenBookContent(
-                Filterable.passThrough(Component.translatable("journal.memoryechoes.title").getString()),
-                Component.translatable("journal.memoryechoes.author").getString(),
+                Filterable.passThrough(TITLE),
+                AUTHOR,
                 0,
                 pages,
                 true));
